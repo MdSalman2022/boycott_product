@@ -2,28 +2,36 @@
 // product.php
 require_once __DIR__ . '/../config/db.php';
 
-class Product {
+class Product { 
 
-    public static function createProduct($name, $brand, $source, $image, $is_israeli = 1, $status = 'active', $description = '') {
+    public static function createProduct($name, $brand, $source, $image, $is_israeli, $status, $description, $category_id, $user_id) {
         global $mysqli;
-        // Changed query to include status and description
-        $query = "INSERT INTO products (name, brand, link, image, is_israeli, status, description) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+        
+        $query = "INSERT INTO products (name, brand, link, image, is_israeli, status, description, category_id, created_by) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = mysqli_prepare($mysqli, $query);
-        // Change 'ssssis' to 'ssssiss' - adding the final 's' for description
-        mysqli_stmt_bind_param($stmt, 'ssssiss', 
-                              $name, $brand, $source, $image, $is_israeli, $status, $description);
+        mysqli_stmt_bind_param($stmt, "ssssissii", $name, $brand, $source, $image, $is_israeli, $status, $description, $category_id, $user_id);
         
-        $success = mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-        
-        return $success;
+        return mysqli_stmt_execute($stmt);
     }
-    
-    // Get all products
-        // Get all products with category data
+    // Get all products 
     public static function getAllProducts() {
+        global $mysqli;
+        $query = "SELECT p.*, c.name AS category_name, c.description AS category_description 
+                  FROM products p
+                  LEFT JOIN categories c ON p.category_id = c.id
+                  WHERE p.is_israeli = 1 AND p.status = 'active'";
+        $result = mysqli_query($mysqli, $query);
+        
+        if ($result) {
+            return mysqli_fetch_all($result, MYSQLI_ASSOC);
+        } else {
+            return [];
+        }
+    }
+
+    public static function getAllProductsAdmin() {
         global $mysqli;
         $query = "SELECT p.*, c.name AS category_name, c.description AS category_description 
                   FROM products p

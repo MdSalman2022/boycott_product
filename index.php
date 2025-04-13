@@ -179,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
     </div>
 
     <!-- Products Grid -->
+        <!-- Products Grid -->
     <div class="container mx-auto px-4 pb-16">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <?php foreach ($products as $product) { ?>
@@ -189,7 +190,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                         </div>
                         <div class="p-4">
                             <h5 class="font-semibold text-gray-800 mb-1 line-clamp-1"><?= htmlspecialchars($product['name']) ?></h5>
-                            <p class="text-sm text-blue-600 font-medium"><?= htmlspecialchars($product['brand']) ?></p>
+                            <div class="flex items-center flex-wrap gap-2">
+                                <p class="text-sm text-blue-600 font-medium"><?= htmlspecialchars($product['brand']) ?></p>
+                                
+                                <?php if (!empty($product['category_name'])): ?>
+                                <!-- Category Badge -->
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                    </svg>
+                                    <?= htmlspecialchars($product['category_name']) ?>
+                                </span>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                     <button
@@ -273,7 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
             categoryElement.classList.remove('hidden');
           } else {
             categoryElement.classList.add('hidden');
-          }
+        }
 
         // Handle alternatives display
         const alternativesList = document.getElementById('alternatives-list');

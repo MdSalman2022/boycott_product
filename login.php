@@ -1,33 +1,39 @@
 <?php
+// filepath: f:\projects\web_eng_lab_reports\lab_project\final_php_website\login.php
+// Start the session at the very beginning
+session_start();
+
 require_once 'config/db.php';
 require_once 'models/user.php';
-require_once 'includes/header.php';
 
 $error_message = '';
 
-// if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-//     $phone = $_POST['phone'];
-//     $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $phone = $_POST['phone'];
+    $password = $_POST['password'];
 
-//     $user = User::getUserByPhone($phone);
+    $user = User::getUserByPhone($phone);
     
-//     if ($user && password_verify($password, $user['password'])) {
-//         session_start();
-//         $_SESSION['user_id'] = $user['id'];
-//         $_SESSION['name']    = $user['name'];
-//         $_SESSION['phone']   = $user['phone'];
-//         $_SESSION['role']    = $user['role'];
+    if ($user && password_verify($password, $user['password'])) {
+        // Store user data in session
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['name']    = $user['name'];
+        $_SESSION['phone']   = $user['phone'];
+        $_SESSION['role']    = $user['role'];
 
-//         // Redirect to last page or fallback to homepage
-//         $redirect_to = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
-//         unset($_SESSION['redirect_to']);
-//         header("Location: " . $redirect_to);
-//         exit();
-//     } else {
-//         $error_message = "Invalid phone number or password.";
-//     }
-// }
-// ?>
+        // Redirect to last page or fallback to homepage
+        $redirect_to = isset($_SESSION['redirect_to']) ? $_SESSION['redirect_to'] : 'index.php';
+        unset($_SESSION['redirect_to']);
+        header("Location: " . $redirect_to);
+        exit();
+    } else {
+        $error_message = "Invalid phone number or password.";
+    }
+}
+
+// Include header AFTER all potential redirects
+require_once 'includes/header.php';
+?>
 
 <div class="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">

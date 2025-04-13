@@ -27,13 +27,24 @@ try {
 $categoryCount = count($categories);
 
 // Get product counts for each category
+// Get product counts for each category - only count ACTIVE products
 foreach ($categories as $key => $category) {
-    $countQuery = "SELECT COUNT(*) as count FROM products WHERE category_id = " . $category['id'];
-    $countResult = mysqli_query($mysqli, $countQuery);
-    if ($countResult) {
-        $countRow = mysqli_fetch_assoc($countResult);
-        $categories[$key]['product_count'] = $countRow['count'];
-    } else {
+    try {
+        // Use prepared statement for security
+        $countQuery = "SELECT COUNT(*) as count FROM products WHERE category_id = ? AND status = 'active'";
+        $stmt = mysqli_prepare($mysqli, $countQuery);
+        mysqli_stmt_bind_param($stmt, "i", $category['id']);
+        mysqli_stmt_execute($stmt);
+        $countResult = mysqli_stmt_get_result($stmt);
+        
+        if ($countResult) {
+            $countRow = mysqli_fetch_assoc($countResult);
+            $categories[$key]['product_count'] = $countRow['count'];
+        } else {
+            $categories[$key]['product_count'] = 0;
+        }
+    } catch (Exception $e) {
+        // Handle error gracefully
         $categories[$key]['product_count'] = 0;
     }
 }
@@ -94,5 +105,4 @@ foreach ($categories as $key => $category) {
         </div>
     <?php endif; ?>
 </div>
-
-<!-- Now let's create a corresponding category.php page to display products from a specific category -->
+ 

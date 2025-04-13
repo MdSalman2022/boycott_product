@@ -14,11 +14,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// Now it's safe to include the header
 require_once 'includes/header.php';
 
 // Get all products
-$products = Product::getAllProducts();
+$products = Product::getAllProductsAdmin();
 
 $debugMode = false;
 if ($debugMode) {
@@ -26,6 +25,7 @@ if ($debugMode) {
     print_r($products);
     echo "</pre>";
 }
+
 // Handle delete action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
     $productId = $_POST['product_id'];
@@ -260,36 +260,56 @@ document.addEventListener('DOMContentLoaded', function() {
     closeModalBtn.addEventListener('click', closeModal);
     
     // Handle delete confirmation
-    confirmDeleteBtn.addEventListener('click', async function() {
-        const productId = productIdInput.value;
+   // Handle delete confirmation
+confirmDeleteBtn.addEventListener('click', async function() {
+    const productId = productIdInput.value;
+    
+    try {
+        const response = await fetch('dashboard.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `action=delete&product_id=${productId}`
+        });
         
-        try {
-            const response = await fetch('dashboard.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: `action=delete&product_id=${productId}`
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                showToast('Product deleted successfully', 'success');
-                // Remove the row from the table
-                const productRow = document.querySelector(`.delete-btn[data-id="${productId}"]`).closest('tr');
-                productRow.remove();
-            } else {
-                showToast('Failed to delete product', 'error');
-            }
-        } catch (error) {
-            showToast('An error occurred', 'error');
-            console.error(error);
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error('Server returned ' + response.status);
         }
         
-        closeModal();
-    });
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Product deleted successfully', 'success');
+            // Remove the row from the table
+            const productRow = document.querySelector(`.delete-btn[data-id="${productId}"]`).closest('tr');
+            if (productRow) {
+                productRow.remove();
+            } else {
+                // If row can't be found, reload the page
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } else {
+            showToast('Failed to delete product', 'error');
+        }
+    } catch (error) {
+        console.error('Error details:', error);
+        
+        // Even if there's an error in processing the response,
+        // the product might have been deleted successfully, so check
+        const productRow = document.querySelector(`.delete-btn[data-id="${productId}"]`);
+        if (!productRow) {
+            showToast('Product appears to be deleted. Refreshing page...', 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showToast('Error processing response. Check console for details.', 'error');
+        }
+    }
+    
+    closeModal();
+});
     
     // Check for URL parameters to show notifications
     const urlParams = new URLSearchParams(window.location.search);

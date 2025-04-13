@@ -29,25 +29,24 @@ try {
   // Handle database error
   $categories = [];
   echo "Database error: " . $e->getMessage();
-}
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = $_POST['name'];
-    $brand = $_POST['brand'];
-    $source = $_POST['source'];
-    $image = $_POST['image'];
-    $status = $_POST['status'];
-    $category_id = $_POST['category_id']; // Get category ID from form
-    $is_israeli = 1; // Default to Israeli product
-    
-    // Add product to database (updated to include category_id)
-    $success = Product::createProduct($name, $brand, $source, $image, $is_israeli, $status, $category_id); 
-    
-    // if ($success) {
-    //     header("Location: dashboard.php");
-    //     exit();
-    // }
-}
+} 
+    // Handle form submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $name = $_POST['name'];
+      $brand = $_POST['brand'];
+      $source = $_POST['source'];
+      $image = $_POST['image'];
+      $status = $_POST['status'];
+      $description = $_POST['description'] ?? ''; // Get description or default to empty string
+      $category_id = $_POST['category_id']; // Get category ID from form
+      $is_israeli = 1; // Default to Israeli product
+      $user_id = $_SESSION['user_id']; // Get current user ID from session
+      
+      // Add product to database with updated parameters
+      $success = Product::createProduct($name, $brand, $source, $image, $is_israeli, $status, $description, $category_id, $user_id); 
+      
+       
+    }
 ?>
 
 
@@ -63,7 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="text" id="name" name="name" required
                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
-      
+      <div class="mb-4">
+        <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
+        <textarea id="description" name="description" rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+            
       <div class="mb-4">
         <label for="brand" class="block text-gray-700 font-medium mb-2">Brand</label>
         <input type="text" id="brand" name="brand" required
