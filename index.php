@@ -1,9 +1,6 @@
 <?php
 // index.php
 require_once 'models/product.php';
-require_once 'includes/header.php'; 
-
-$products = Product::getAllProducts(); 
 
 // Check for form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
@@ -12,19 +9,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
     $description = $_POST['altDesc'];
     $image = $_POST['altImage'];
     $link = $_POST['altLink'];
-    $ref_id = $_POST['original_product_id']; 
-    
+    $ref_id = $_POST['original_product_id'];
+
     $status = 'active';
-    
+
     $success = Product::addAlternative($productName, $brand, $image, $link, $ref_id, $description, $status);
-    
+
     if ($success) {
-        header("Location: index.php?alt_added=success");
+        header("Location: index.php");
     } else {
-        header("Location: index.php?alt_added=error");
+        header("Location: index.php");
     }
     exit();
 }
+// Now include the header after all header modifications
+require_once 'includes/header.php';
+
+$products = Product::getAllProducts();
 ?>
 
 <!-- Add Alternative Modal -->
@@ -40,32 +41,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
         </div>
         <form action="index.php" method="POST" enctype="multipart/form-data" class="space-y-4">
             <input type="hidden" name="original_product_id" id="original_product_id" />
-            
+
             <div>
                 <label for="altName" class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
                 <input type="text" id="altName" name="altName" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
-            
+
             <div>
                 <label for="altBrand" class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
                 <input type="text" id="altBrand" name="altBrand" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
-            
+
             <div>
                 <label for="altDesc" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea id="altDesc" name="altDesc" rows="3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 resize-y" required></textarea>
             </div>
-            
+
             <div>
                 <label for="altImage" class="block text-sm font-medium text-gray-700 mb-1">Image Link</label>
                 <input type="text" id="altImage" name="altImage" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
-            
+
             <div>
                 <label for="altLink" class="block text-sm font-medium text-gray-700 mb-1">Source Link</label>
                 <input type="url" id="altLink" name="altLink" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
-            
+
             <div class="flex justify-end space-x-3 pt-4 border-t">
                 <button type="button" id="addAltCancelBtn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all">Cancel</button>
                 <button type="submit" name="add-alternative" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">Submit</button>
@@ -85,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                 </svg>
             </button>
         </div>
-        
+
         <div class="flex flex-col md:flex-row gap-6 mb-6">
             <div class="flex-shrink-0">
                 <img id="modal-product-image" class="w-full md:w-40 h-40 object-contain bg-gray-50 rounded-lg border border-gray-200" />
@@ -104,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                 <div id="modal-product-source" class="text-xs text-gray-500 italic"></div>
             </div>
         </div>
-        
+
         <div class="border-t pt-5">
             <div class="flex justify-between items-center mb-3">
                 <h3 class="text-lg font-semibold text-gray-800">Alternatives</h3>
@@ -115,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                     Add Alternative
                 </button>
             </div>
-            
+
             <!-- Alternatives List -->
             <div class="mt-2">
                 <ul id="alternatives-list" class="space-y-2"></ul>
@@ -130,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
     <div class="container mx-auto px-4 py-12 text-center">
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">Boycott Israel Products</h1>
         <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">Find alternatives to products and companies supporting Israel's actions against Palestine</p>
-        
+
         <!-- Search Bar -->
         <div class="max-w-2xl mx-auto mb-12 relative">
             <div class="flex rounded-lg shadow-sm">
@@ -145,41 +146,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                 <!-- Search results will appear here -->
             </div>
         </div>
-        
+
         <!-- Status Messages -->
         <?php if (isset($_GET['alt_added']) && $_GET['alt_added'] === 'success'): ?>
-        <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-8 rounded-md">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-green-700">Alternative product added successfully!</p>
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-8 rounded-md">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700">Alternative product added successfully!</p>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
-        
+
         <?php if (isset($_GET['alt_added']) && $_GET['alt_added'] === 'error'): ?>
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-8 rounded-md">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-red-700">Error adding alternative product.</p>
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-8 rounded-md">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">Error adding alternative product.</p>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
     </div>
 
     <!-- Products Grid -->
-        <!-- Products Grid -->
+    <!-- Products Grid -->
     <div class="container mx-auto px-4 pb-16">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <?php foreach ($products as $product) { ?>
@@ -192,15 +193,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                             <h5 class="font-semibold text-gray-800 mb-1 line-clamp-1"><?= htmlspecialchars($product['name']) ?></h5>
                             <div class="flex items-center flex-wrap gap-2">
                                 <p class="text-sm text-blue-600 font-medium"><?= htmlspecialchars($product['brand']) ?></p>
-                                
+
                                 <?php if (!empty($product['category_name'])): ?>
-                                
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                    </svg>
-                                    <?= htmlspecialchars($product['category_name']) ?>
-                                </span>
+
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                        <?= htmlspecialchars($product['category_name']) ?>
+                                    </span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -221,99 +222,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
 
 <!-- JS Libraries -->
 <link rel="stylesheet" href="assets/css/style.css">
-<script src="assets/js/script.js"></script> 
+<script src="assets/js/script.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script>
-  // Add Alternative Button
-  document.querySelectorAll('.add-alternative').forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent opening product details
-      const productId = button.getAttribute('data-id');
-      document.getElementById('original_product_id').value = productId;
-      document.getElementById('add-alternative-modal').classList.remove('hidden');
+    // Add Alternative Button
+    document.querySelectorAll('.add-alternative').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent opening product details
+            const productId = button.getAttribute('data-id');
+            document.getElementById('original_product_id').value = productId;
+            document.getElementById('add-alternative-modal').classList.remove('hidden');
+        });
     });
-  });
 
-  // Add Alternative from Product Details
-  document.getElementById('productDetailsAddAlt').addEventListener('click', () => {
-    const productId = document.getElementById('productDetailsAddAlt').getAttribute('data-product-id');
-    document.getElementById('original_product_id').value = productId;
-    document.getElementById('product-details-modal').classList.add('hidden');
-    document.getElementById('add-alternative-modal').classList.remove('hidden');
-  });
- 
-  // Modal Close Buttons
-  document.getElementById('addAltCancel').addEventListener('click', () => {
-    document.getElementById('add-alternative-modal').classList.add('hidden');
-  });
-  
-  document.getElementById('addAltCancelBtn').addEventListener('click', () => {
-    document.getElementById('add-alternative-modal').classList.add('hidden');
-  });
-    
-  document.getElementById('productDetailsClose').addEventListener('click', () => {
-    document.getElementById('product-details-modal').classList.add('hidden');
-  });
+    // Add Alternative from Product Details
+    document.getElementById('productDetailsAddAlt').addEventListener('click', () => {
+        const productId = document.getElementById('productDetailsAddAlt').getAttribute('data-product-id');
+        document.getElementById('original_product_id').value = productId;
+        document.getElementById('product-details-modal').classList.add('hidden');
+        document.getElementById('add-alternative-modal').classList.remove('hidden');
+    });
 
-  // Product Cards Click Handler
-  document.querySelectorAll('.product-card').forEach(productDiv => {
-    productDiv.addEventListener('click', async () => {
-      const productId = productDiv.parentElement.querySelector('.add-alternative').getAttribute('data-id');
-      
-      try {
-        // Fetch product details
-        const response = await fetch(`api/get-product.php?id=${productId}`);
-        const data = await response.json();
-          
-        // Set product ID for Add Alternative button
-        document.getElementById('productDetailsAddAlt').setAttribute('data-product-id', productId);
-    
-        // Update product details in modal
-        document.getElementById('modal-product-name').textContent = data.product.name;
-        document.getElementById('modal-product-brand').textContent = data.product.brand;
-        document.getElementById('modal-product-image').src = data.product.image;
-        document.getElementById('modal-product-description').textContent = data.product.description || 'No description available';
-        document.getElementById('modal-product-source').innerHTML = `Source: <a href="${data.product.link}" target="_blank" class="text-blue-600 hover:underline">${data.product.link}</a>`;
-        
+    // Modal Close Buttons
+    document.getElementById('addAltCancel').addEventListener('click', () => {
+        document.getElementById('add-alternative-modal').classList.add('hidden');
+    });
 
-        const categoryElement = document.getElementById('modal-product-category');
-        const categoryNameElement = document.getElementById('category-name');
-      
-        if (data.product.category_name) {
-            categoryNameElement.textContent = data.product.category_name;
-            categoryElement.classList.remove('hidden');
-          } else {
-            categoryElement.classList.add('hidden');
-        }
+    document.getElementById('addAltCancelBtn').addEventListener('click', () => {
+        document.getElementById('add-alternative-modal').classList.add('hidden');
+    });
 
-        // Handle alternatives display
-        const alternativesList = document.getElementById('alternatives-list');
-        alternativesList.innerHTML = '';
-        
-        if (data.alternatives.length > 0) {
-          // Create Swiper slider for alternatives
-          const swiperContainer = document.createElement('div');
-          swiperContainer.className = 'alternatives-swiper-container';
-          
-          const swiperWrapper = document.createElement('div');
-          swiperWrapper.className = 'swiper alternativesSwiper';
-          swiperWrapper.innerHTML = `
+    document.getElementById('productDetailsClose').addEventListener('click', () => {
+        document.getElementById('product-details-modal').classList.add('hidden');
+    });
+
+    // Product Cards Click Handler
+    document.querySelectorAll('.product-card').forEach(productDiv => {
+        productDiv.addEventListener('click', async () => {
+            const productId = productDiv.parentElement.querySelector('.add-alternative').getAttribute('data-id');
+
+            try {
+                // Fetch product details
+                const response = await fetch(`api/get-product.php?id=${productId}`);
+                const data = await response.json();
+
+                // Set product ID for Add Alternative button
+                document.getElementById('productDetailsAddAlt').setAttribute('data-product-id', productId);
+
+                // Update product details in modal
+                document.getElementById('modal-product-name').textContent = data.product.name;
+                document.getElementById('modal-product-brand').textContent = data.product.brand;
+                document.getElementById('modal-product-image').src = data.product.image;
+                document.getElementById('modal-product-description').textContent = data.product.description || 'No description available';
+                document.getElementById('modal-product-source').innerHTML = `Source: <a href="${data.product.link}" target="_blank" class="text-blue-600 hover:underline">${data.product.link}</a>`;
+
+
+                const categoryElement = document.getElementById('modal-product-category');
+                const categoryNameElement = document.getElementById('category-name');
+
+                if (data.product.category_name) {
+                    categoryNameElement.textContent = data.product.category_name;
+                    categoryElement.classList.remove('hidden');
+                } else {
+                    categoryElement.classList.add('hidden');
+                }
+
+                // Handle alternatives display
+                const alternativesList = document.getElementById('alternatives-list');
+                alternativesList.innerHTML = '';
+
+                if (data.alternatives.length > 0) {
+                    // Create Swiper slider for alternatives
+                    const swiperContainer = document.createElement('div');
+                    swiperContainer.className = 'alternatives-swiper-container';
+
+                    const swiperWrapper = document.createElement('div');
+                    swiperWrapper.className = 'swiper alternativesSwiper';
+                    swiperWrapper.innerHTML = `
             <div class="swiper-wrapper"></div>
             <div class="swiper-pagination"></div>
             <div class="swiper-button-prev"></div>
             <div class="swiper-button-next"></div>
           `;
-          swiperContainer.appendChild(swiperWrapper);
-          
-          // Add alternative cards to Swiper
-          const swiperSlides = swiperWrapper.querySelector('.swiper-wrapper');
-          
-          data.alternatives.forEach(alt => {
-            const slide = document.createElement('div');
-            slide.className = 'swiper-slide';
-            slide.innerHTML = `
+                    swiperContainer.appendChild(swiperWrapper);
+
+                    // Add alternative cards to Swiper
+                    const swiperSlides = swiperWrapper.querySelector('.swiper-wrapper');
+
+                    data.alternatives.forEach(alt => {
+                        const slide = document.createElement('div');
+                        slide.className = 'swiper-slide';
+                        slide.innerHTML = `
               <div class="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow transition h-full p-4">
                 <img src="${alt.image}" class="w-full h-24 object-contain mb-3 rounded-md" onerror="this.src='assets/images/placeholder.png'">
                 <h4 class="font-medium text-gray-800 text-sm mb-1 truncate">${alt.name}</h4>
@@ -328,37 +329,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
                 </a>
               </div>
             `;
-            swiperSlides.appendChild(slide);
-          });
-          
-          alternativesList.appendChild(swiperContainer);
-          
-          // Initialize Swiper with short timeout
-          setTimeout(() => {
-            new Swiper('.alternativesSwiper', {
-              slidesPerView: 1,
-              spaceBetween: 20,
-              pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-              },
-              navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-              },
-              breakpoints: {
-                640: {
-                  slidesPerView: 2,
-                },
-                768: {
-                  slidesPerView: 2,
-                }
-              }
-            });
-          }, 100);
-        } else {
-          // No alternatives message
-          alternativesList.innerHTML = `
+                        swiperSlides.appendChild(slide);
+                    });
+
+                    alternativesList.appendChild(swiperContainer);
+
+                    // Initialize Swiper with short timeout
+                    setTimeout(() => {
+                        new Swiper('.alternativesSwiper', {
+                            slidesPerView: 1,
+                            spaceBetween: 20,
+                            pagination: {
+                                el: '.swiper-pagination',
+                                clickable: true,
+                            },
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                            breakpoints: {
+                                640: {
+                                    slidesPerView: 2,
+                                },
+                                768: {
+                                    slidesPerView: 2,
+                                }
+                            }
+                        });
+                    }, 100);
+                } else {
+                    // No alternatives message
+                    alternativesList.innerHTML = `
             <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -367,54 +368,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-alternative'])) {
               <p class="text-sm text-gray-500">Be the first to suggest an alternative product</p>
             </div>
           `;
-        }
-        
-        // Show modal
-        document.getElementById('product-details-modal').classList.remove('hidden');
-      } catch (error) {
-        console.error("Error fetching product data:", error);
-      }
-    }); 
-  });
-  
-  // Search functionality
-const searchInput = document.getElementById('search');
-const searchResults = document.getElementById('search-results');
+                }
 
-searchInput.addEventListener('input', function() {
-  const query = this.value.trim();
-  
-  // Filter products based on search query
-  const filteredProducts = Array.from(document.querySelectorAll('.product-card'))
-    .filter(card => {
-      // If query is empty or less than 2 chars, include all products
-      if (query.length < 2) {
-        return true;
-      }
-      
-      const name = card.querySelector('h5').textContent.toLowerCase();
-      const brand = card.querySelector('p').textContent.toLowerCase();
-      return name.includes(query.toLowerCase()) || brand.includes(query.toLowerCase());
+                // Show modal
+                document.getElementById('product-details-modal').classList.remove('hidden');
+            } catch (error) {
+                console.error("Error fetching product data:", error);
+            }
+        });
     });
-  
-  // Handle results display
-  if (query.length < 2) {
-    searchResults.classList.add('hidden');
-  } else {
-    // Display count of matching products
-    const count = filteredProducts.length;
-    searchResults.innerHTML = `<p class="px-4 py-2 text-sm font-medium text-gray-700">Found ${count} matching product${count === 1 ? '' : 's'}</p>`;
-    searchResults.classList.remove('hidden');
-  }
-  
-  // Show/hide products based on search
-  document.querySelectorAll('.product-card').forEach(card => {
-    const productContainer = card.parentElement;
-    if (filteredProducts.includes(card)) {
-      productContainer.classList.remove('hidden');
-    } else {
-      productContainer.classList.add('hidden');
-    }
-  });
-});
+
+    // Search functionality
+    const searchInput = document.getElementById('search');
+    const searchResults = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+
+        // Filter products based on search query
+        const filteredProducts = Array.from(document.querySelectorAll('.product-card'))
+            .filter(card => {
+                // If query is empty or less than 2 chars, include all products
+                if (query.length < 2) {
+                    return true;
+                }
+
+                const name = card.querySelector('h5').textContent.toLowerCase();
+                const brand = card.querySelector('p').textContent.toLowerCase();
+                return name.includes(query.toLowerCase()) || brand.includes(query.toLowerCase());
+            });
+
+        // Handle results display
+        if (query.length < 2) {
+            searchResults.classList.add('hidden');
+        } else {
+            // Display count of matching products
+            const count = filteredProducts.length;
+            searchResults.innerHTML = `<p class="px-4 py-2 text-sm font-medium text-gray-700">Found ${count} matching product${count === 1 ? '' : 's'}</p>`;
+            searchResults.classList.remove('hidden');
+        }
+
+        // Show/hide products based on search
+        document.querySelectorAll('.product-card').forEach(card => {
+            const productContainer = card.parentElement;
+            if (filteredProducts.includes(card)) {
+                productContainer.classList.remove('hidden');
+            } else {
+                productContainer.classList.add('hidden');
+            }
+        });
+    });
 </script>
